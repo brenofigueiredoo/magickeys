@@ -1,0 +1,86 @@
+{
+  "usuarios": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "nome": "Admin",
+      "email": "admin@magickeys.com",
+      "senha": "$2b$10$Ubv9vSh5bX0akT.Y.Qc6A.v77QqmkzZ63Fkcoo2p8r6xrGnkWFfe6",
+      "idade": "30",
+      "img": 1,
+      "dataCadastro": "2023-01-01",
+      "ehAdmin": true
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "nome": "Usuário Comum",
+      "email": "usuario@magickeys.com",
+      "senha": "user123",
+      "idade": "25",
+      "img": 2,
+      "dataCadastro": "2023-01-02",
+      "ehAdmin": false
+    }
+  ],
+  "musicas": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "nome": "Amanhã nunca mais",
+      "urlArquivo": "/assets/midi/007amanha_nuncamais2.mid",
+      "usuarioId": "550e8400-e29b-41d4-a716-446655440000",
+      "genero": "Clássico"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440003",
+      "nome": "Moonlight Sonata",
+      "urlArquivo": "/assets/midi/moonlight_sonata.mid",
+      "usuarioId": "550e8400-e29b-41d4-a716-446655440000",
+      "genero": "Clássico"
+    }
+  ],
+  "musicas_favoritas": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "usuarioId": "550e8400-e29b-41d4-a716-446655440001",
+      "musicaId": "550e8400-e29b-41d4-a716-446655440002",
+      "dataAdicionada": "2023-02-01"
+    }
+  ],
+  "licoes": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440005",
+      "musicaId": "550e8400-e29b-41d4-a716-446655440002",
+      "usuarioId": "550e8400-e29b-41d4-a716-446655440000",
+      "titulo": "Introdução ao Piano",
+      "descricao": "Aprenda os fundamentos do piano com esta lição introdutória",
+      "dificuldade": "facil"
+    }
+  ],
+  "desafios": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440006",
+      "musicaId": "550e8400-e29b-41d4-a716-446655440003",
+      "usuarioId": "550e8400-e29b-41d4-a716-446655440000",
+      "titulo": "Desafio Moonlight",
+      "descricao": "Tente tocar o primeiro movimento da Sonata ao Luar",
+      "dificuldade": "medio"
+    }
+  ],
+  "progresso_desafios": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440007",
+      "usuarioId": "550e8400-e29b-41d4-a716-446655440001",
+      "desafioId": "550e8400-e29b-41d4-a716-446655440006",
+      "pontuacao": 75,
+      "dataProgresso": "2023-03-01"
+    }
+  ],
+  "progresso_licoes": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440008",
+      "usuarioId": "550e8400-e29b-41d4-a716-446655440001",
+      "licaoId": "550e8400-e29b-41d4-a716-446655440005",
+      "porcentagem": 50,
+      "dataProgresso": "2023-03-02"
+    }
+  ]
+}
