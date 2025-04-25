@@ -25,14 +25,14 @@
     {
       "id": "550e8400-e29b-41d4-a716-446655440002",
       "nome": "Amanhã nunca mais",
-      "urlArquivo": "/assets/midi/007amanha_nuncamais2.mid",
+      "urlArquivo": "/uploads/midi/007amanha_nuncamais2.mid",
       "usuarioId": "550e8400-e29b-41d4-a716-446655440000",
       "genero": "Clássico"
     },
     {
       "id": "550e8400-e29b-41d4-a716-446655440003",
       "nome": "Moonlight Sonata",
-      "urlArquivo": "/assets/midi/moonlight_sonata.mid",
+      "urlArquivo": "/uploads/midi/moonlight_sonata.mid",
       "usuarioId": "550e8400-e29b-41d4-a716-446655440000",
       "genero": "Clássico"
     }
