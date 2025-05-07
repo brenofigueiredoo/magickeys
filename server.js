@@ -11,7 +11,7 @@ import express from "express";
 import path from "node:path";
 
 const server = jsonServer.create();
-const router = jsonServer.router("../api/db.json");
+const router = jsonServer.router("./db.json");
 const middlewares = jsonServer.defaults();
 
 server.use(cors());
