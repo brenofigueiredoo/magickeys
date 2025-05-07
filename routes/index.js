@@ -1,4 +1,4 @@
 import jsonServer from "json-server";
-const router = jsonServer.router("../api/db.json");
+const router = jsonServer.router("../db.json");
 
 export { router };
