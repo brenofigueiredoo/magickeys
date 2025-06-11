@@ -1,0 +1,39 @@
+{
+  "lessons": [
+    {
+      "musicaId": "minuet.mid",
+      "titulo": "As rodas do ônibus rodam, rodam",
+      "descricao": "Ouça as notas e depois tente enncontrá-las no piano",
+      "dificuldade": "f",
+      "id": "1675"
+    },
+    {
+      "musicaId": "1234238",
+      "titulo": "Brilha, briha, Estrelinha",
+      "descricao": "Ouça as notas e depois tente enncontrá-las no piano",
+      "dificuldade": "m",
+      "id": "26b0"
+    },
+    {
+      "musicaId": "2334238",
+      "titulo": "Jingle Bells",
+      "descricao": "Ouça as notas e depois tente enncontrá-las no piano",
+      "dificuldade": "d",
+      "id": "1cf0"
+    },
+    {
+      "id": "de2a",
+      "titulo": "5tf",
+      "descricao": "fds",
+      "musicaId": "bach_846.mid",
+      "dificuldade": "1"
+    },
+    {
+      "id": "939f",
+      "titulo": "Title",
+      "descricao": "instrucoes",
+      "musicaId": "bach_847.mid",
+      "dificuldade": "d"
+    }
+  ]
+}

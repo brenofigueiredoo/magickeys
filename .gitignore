@@ -1,62 +1,36 @@
-# Dependências
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
 node_modules/
 
-# Arquivos de build
-dist/
-build/
-web-build/
-
-# Arquivos de ambiente
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Arquivos de cache
-.cache/
+# Expo
 .expo/
-.next/
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Arquivos do sistema operacional
-.DS_Store
-Thumbs.db
-
-# Arquivos de IDE e editores
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Arquivos de configuração local
-*.local
-
-# Arquivos temporários
-*.tmp
-*.temp
-
-# Arquivos de banco de dados SQLite
-*.sqlite
-*.sqlite3
-
-# Arquivos de TypeScript
-*.tsbuildinfo
-
-# Arquivos específicos do React Native/Expo
+dist/
+web-build/
 expo-env.d.ts
+
+# Native
+*.orig.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
+
+# Metro
 .metro-health-check*
 
-# Arquivos específicos do JSON Server
-.json-server/
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
