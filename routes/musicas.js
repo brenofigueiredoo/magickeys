@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { router } from "./index.js";
-import { authIsAdminMiddleware } from "../middlewares/auth.js";
+import { authIsAdminMiddleware, authMiddleware } from "../middlewares/auth.js";
 import path from "node:path";
 import fs from "node:fs";
 import uploadMidi from "../middlewares/uploadMidi.js";
@@ -9,158 +9,174 @@ import uploadMidi from "../middlewares/uploadMidi.js";
 const musicasRouter = Router();
 
 musicasRouter.post(
-	"/musicas",
-	authIsAdminMiddleware,
-	uploadMidi.single("arquivo"),
-	(req, res) => {
-		try {
-			const { nome, genero } = req.body;
-			const usuarioId = req.user.id;
+  "/musicas",
+  authIsAdminMiddleware,
+  uploadMidi.single("arquivo"),
+  (req, res) => {
+    try {
+      const { nome, genero, duracao } = req.body;
+      const usuarioId = req.user.id;
 
-			if (req.file && (!nome || !genero)) {
-				fs.unlinkSync(req.file.path);
-				return res
-					.status(400)
-					.json({ error: "Nome e gênero são obrigatórios" });
-			}
+      if (req.file && (!nome || !genero)) {
+        fs.unlinkSync(req.file.path);
+        return res
+          .status(400)
+          .json({ error: "Nome e gênero são obrigatórios" });
+      }
 
-			if (!nome || !genero || !req.file) {
-				return res
-					.status(400)
-					.json({ error: "Nome e arquivo MIDI são obrigatórios" });
-			}
+      if (!nome || !genero || !req.file) {
+        return res
+          .status(400)
+          .json({ error: "Nome, gênero e arquivo MIDI são obrigatórios" });
+      }
 
-			const arquivoPath = path.resolve(process.cwd(), req.file.path);
-			if (!fs.existsSync(arquivoPath)) {
-				return res.status(500).json({ error: "Erro ao salvar arquivo MIDI" });
-			}
+      const arquivoPath = path.resolve(process.cwd(), req.file.path);
+      if (!fs.existsSync(arquivoPath)) {
+        return res.status(500).json({ error: "Erro ao salvar arquivo MIDI" });
+      }
 
-			const urlArquivo = `/uploads/midi/${path.basename(req.file.path)}`;
+      const urlArquivo = `/uploads/midi/${path.basename(req.file.path)}`;
 
-			const novaMusica = {
-				id: uuidv4(),
-				nome,
-				urlArquivo,
-				usuarioId,
-				genero,
-			};
+      const novaMusica = {
+        id: uuidv4(),
+        nome,
+        urlArquivo,
+        usuarioId,
+        genero,
+        duracao: duracao || null,
+        dataCadastro: new Date().toISOString(),
+      };
 
-			router.db.get("musicas").push(novaMusica).write();
+      router.db.get("musicas").push(novaMusica).write();
 
-			return res.status(201).json(novaMusica);
-		} catch (error) {
-			return res.status(500).json({ error: "Erro ao criar música" });
-		}
-	},
+      return res.status(201).json(novaMusica);
+    } catch (error) {
+      return res.status(500).json({ error: "Erro ao criar música" });
+    }
+  }
 );
 
-musicasRouter.get("/musicas", (req, res) => {
-	try {
-		const { genero } = req.query;
-		let musicas = router.db.get("musicas").value();
+musicasRouter.get("/musicas", authMiddleware, (req, res) => {
+  try {
+    const usuarioId = req.user.id;
 
-		if (genero) {
-			musicas = musicas.filter(
-				(musica) =>
-					musica.genero && musica.genero.toLowerCase() === genero.toLowerCase(),
-			);
-		}
+    const { genero } = req.query;
+    let musicas = router.db.get("musicas").value();
 
-		const musicasComDetalhes = musicas.map((musica) => {
-			const usuario = router.db
-				.get("usuarios")
-				.find({ id: musica.usuarioId })
-				.value();
+    if (genero) {
+      musicas = musicas.filter(
+        (musica) =>
+          musica.genero && musica.genero.toLowerCase() === genero.toLowerCase()
+      );
+    }
 
-			const { senha, ...usuarioSemSenha } = usuario || {};
+    // Obter todas as músicas favoritas do usuário logado
+    const musicasFavoritas = router.db
+      .get("musicas_favoritas")
+      .filter({ usuarioId })
+      .value()
+      .map((favorito) => favorito.musicaId);
 
-			return {
-				...musica,
-				usuario: usuario ? usuarioSemSenha : null,
-			};
-		});
+    const musicasComDetalhes = musicas.map((musica) => {
+      const usuario = router.db
+        .get("usuarios")
+        .find({ id: musica.usuarioId })
+        .value();
 
-		return res.status(200).json(musicasComDetalhes);
-	} catch (error) {
-		return res.status(500).json({ error: "Erro ao listar músicas" });
-	}
+      const { senha, ...usuarioSemSenha } = usuario || {};
+
+      // Verificar se a música está na lista de favoritos do usuário
+      const ehFavorita = musicasFavoritas.includes(musica.id);
+
+      return {
+        ...musica,
+        usuario: usuario ? usuarioSemSenha : null,
+        ehFavorita: ehFavorita,
+      };
+    });
+
+    return res.status(200).json(musicasComDetalhes);
+  } catch (error) {
+    return res.status(500).json({ error: "Erro ao listar músicas" });
+  }
 });
 
 musicasRouter.get("/musicas/:id", (req, res) => {
-	try {
-		const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-		const musica = router.db.get("musicas").find({ id }).value();
+    const musica = router.db.get("musicas").find({ id }).value();
 
-		if (!musica) {
-			return res.status(404).json({ error: "Música não encontrada" });
-		}
+    if (!musica) {
+      return res.status(404).json({ error: "Música não encontrada" });
+    }
 
-		const usuario = router.db
-			.get("usuarios")
-			.find({ id: musica.usuarioId })
-			.value();
+    const usuario = router.db
+      .get("usuarios")
+      .find({ id: musica.usuarioId })
+      .value();
 
-		const { senha, ...usuarioSemSenha } = usuario || {};
+    const { senha, ...usuarioSemSenha } = usuario || {};
 
-		return res.status(200).json({
-			...musica,
-			usuario: usuario ? usuarioSemSenha : null,
-		});
-	} catch (error) {
-		return res.status(500).json({ error: "Erro ao buscar música" });
-	}
+    return res.status(200).json({
+      ...musica,
+      usuario: usuario ? usuarioSemSenha : null,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Erro ao buscar música" });
+  }
 });
 
 musicasRouter.put("/musicas/:id", authIsAdminMiddleware, (req, res) => {
-	try {
-		const { id } = req.params;
-		const { nome, urlArquivo, genero } = req.body;
+  try {
+    const { id } = req.params;
+    const { nome, urlArquivo, genero, duracao } = req.body;
 
-		const musicas = router.db.get("musicas");
-		const musica = musicas.find({ id }).value();
+    const musicas = router.db.get("musicas");
+    const musica = musicas.find({ id }).value();
 
-		if (!musica) {
-			return res.status(404).json({ error: "Música não encontrada" });
-		}
+    if (!musica) {
+      return res.status(404).json({ error: "Música não encontrada" });
+    }
 
-		const musicaAtualizada = {
-			...musica,
-			nome: nome || musica.nome,
-			urlArquivo: urlArquivo || musica.urlArquivo,
-			genero: genero !== undefined ? genero : musica.genero,
-		};
+    const musicaAtualizada = {
+      ...musica,
+      nome: nome || musica.nome,
+      urlArquivo: urlArquivo || musica.urlArquivo,
+      genero: genero !== undefined ? genero : musica.genero,
+      duracao: duracao !== undefined ? duracao : musica.duracao,
+    };
 
-		musicas.find({ id }).assign(musicaAtualizada).write();
+    musicas.find({ id }).assign(musicaAtualizada).write();
 
-		return res.status(200).json(musicaAtualizada);
-	} catch (error) {
-		return res.status(500).json({ error: "Erro ao atualizar música" });
-	}
+    return res.status(200).json(musicaAtualizada);
+  } catch (error) {
+    return res.status(500).json({ error: "Erro ao atualizar música" });
+  }
 });
 
 musicasRouter.delete("/musicas/:id", authIsAdminMiddleware, (req, res) => {
-	try {
-		const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-		const musica = router.db.get("musicas").find({ id }).value();
+    const musica = router.db.get("musicas").find({ id }).value();
 
-		if (!musica) {
-			return res.status(404).json({ error: "Música não encontrada" });
-		}
+    if (!musica) {
+      return res.status(404).json({ error: "Música não encontrada" });
+    }
 
-		router.db.get("licoes").remove({ musicaId: id }).write();
+    router.db.get("licoes").remove({ musicaId: id }).write();
 
-		router.db.get("desafios").remove({ musicaId: id }).write();
+    router.db.get("desafios").remove({ musicaId: id }).write();
 
-		router.db.get("musicas_favoritas").remove({ musicaId: id }).write();
+    router.db.get("musicas_favoritas").remove({ musicaId: id }).write();
 
-		router.db.get("musicas").remove({ id }).write();
+    router.db.get("musicas").remove({ id }).write();
 
-		return res.status(200).json({ message: "Música removida com sucesso" });
-	} catch (error) {
-		return res.status(500).json({ error: "Erro ao deletar música" });
-	}
+    return res.status(200).json({ message: "Música removida com sucesso" });
+  } catch (error) {
+    return res.status(500).json({ error: "Erro ao deletar música" });
+  }
 });
 
 export default musicasRouter;
